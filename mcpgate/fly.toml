@@ -1,0 +1,26 @@
+# fly.io app for the Agent Bazaar mcpgate gateway.
+# Deploy from this directory: `fly deploy` (remote builder; no local Docker needed).
+# First time: `fly launch --no-deploy`, then `fly secrets set DEMO_API_KEY=<generated key>`.
+app = "agent-bazaar-mcpgate"
+primary_region = "dfw" # Dallas — closest region to Austin, TX
+
+[build]
+  dockerfile = "Dockerfile"
+
+[http_service]
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = "off" # the demo must stay up for judges; do not scale to zero
+  auto_start_machines = true
+  min_machines_running = 1
+
+[[http_service.checks]]
+  grace_period = "10s"
+  interval = "30s"
+  method = "GET"
+  path = "/healthz"
+  timeout = "5s"
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "256mb"

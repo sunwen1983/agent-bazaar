@@ -1,0 +1,80 @@
+# mcpgate configuration for Agent Bazaar (demo deployment).
+#
+# HOW TO RUN LOCALLY (from the agent-bazaar repo root):
+#   1. Build the mock backends:  (cd tools/mock-mcp && go build -o mock-mcp .)
+#   2. Build mcpgate:            go build -o /tmp/mcpgate ~/workspace/mcpgate/cmd/mcpgate
+#      (use main at/after 9bb4a88 — it includes the CORS middleware from PR #20)
+#   3. Run:                      /tmp/mcpgate -config mcpgate/config.yaml
+#      The gateway listens on :8080 and spawns the three mock backends over
+#      stdio. See LOCAL_E2E.md for the curl checks.
+#
+# DEPLOY: fly.io runs this same file (see fly.toml + Dockerfile). The demo
+# key below is a PLACEHOLDER — the entrypoint replaces it from the
+# DEMO_API_KEY fly secret at container start. Never commit a real key here.
+#
+# The three backends are the only MCP servers in this deployment; the
+# gateway is the only public entry point. Browsers call
+# POST https://agent-bazaar-mcpgate.fly.dev/mcp/{flights,stays,activities}
+# with X-API-Key: <demo key>. CORS is open on /mcp/ and /healthz only
+# (mcpgate's cors middleware, PR #20).
+
+listen: ":8080"
+
+# Demo key: public by design (it lives in the bazaar site's frontend
+# config so judges can run the demo with zero friction). The only hard
+# limit is the rate limit below plus the fact that the backends are
+# read-only mock data — there is nothing to abuse beyond the gateway
+# itself. Rotate the value at deploy time; the placeholder below must
+# be replaced with a generated key before any public deployment.
+api_keys:
+  - key: "demo-key-CHANGE-ME"
+    name: "bazaar-demo"
+    rate_limit:
+      # 30 requests/minute sustained. Burst 10 lets one full team run
+      # (about 6-10 tool calls, spread over LLM round-trips) through
+      # without tripping the limiter; sustained abuse is still capped.
+      requests_per_second: 0.5
+      burst: 10
+
+default_rate_limit:
+  requests_per_second: 0.5
+  burst: 10
+
+backends:
+  - name: "flights"
+    transport: "stdio"
+    command: ["./tools/mock-mcp/mock-mcp", "flights"]
+    timeout: 10s
+    cache:
+      tools_list_ttl: 60s
+      tools_call_ttl: 120s
+      # Search results are deterministic mock data: safe to cache, and
+      # the demo shows "second identical search -> HIT" in the trace.
+      cacheable_tools: ["search_flights"]
+    breaker:
+      failure_threshold: 3
+      cooldown: 30s
+
+  - name: "stays"
+    transport: "stdio"
+    command: ["./tools/mock-mcp/mock-mcp", "stays"]
+    timeout: 10s
+    cache:
+      tools_list_ttl: 60s
+      tools_call_ttl: 120s
+      cacheable_tools: ["search_stays"]
+    breaker:
+      failure_threshold: 3
+      cooldown: 30s
+
+  - name: "activities"
+    transport: "stdio"
+    command: ["./tools/mock-mcp/mock-mcp", "activities"]
+    timeout: 10s
+    cache:
+      tools_list_ttl: 60s
+      tools_call_ttl: 120s
+      cacheable_tools: ["search_activities"]
+    breaker:
+      failure_threshold: 3
+      cooldown: 30s
