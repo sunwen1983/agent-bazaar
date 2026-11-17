@@ -1,0 +1,7 @@
+{
+  "protocol": "nsdeploy-agent-mcp/v1",
+  "network": "stays",
+  "front_man": "stays_agent",
+  "available": false,
+  "reason": "This is a static bundle; a public MCP facade requires an application host."
+}

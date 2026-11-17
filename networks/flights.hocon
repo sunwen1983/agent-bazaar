@@ -1,0 +1,27 @@
+{
+  metadata = {
+    description = "Flights peer network: searches round-trip flights to Austin (AUS) through the flights MCP tool and returns comparable options."
+    sample_queries = ["Find round-trip flights from San Francisco to Austin for next Friday to Sunday, 2 adults, economy, under $400 total."]
+  }
+
+  llm_config = {
+    model_name = "deepseek-chat"
+  }
+
+  tools = [
+    {
+      name = "flights_agent"
+      instructions = """
+You are a flight search agent in the Agent Bazaar marketplace.
+Use the flights MCP tool to search round-trip flights to Austin (AUS) for the requested dates and party size.
+Return 4-6 options with airline, departure/arrival times, stops, price per person, and a booking link when the tool provides one.
+Never invent prices, schedules, or availability: only report what the tool returns. If the tool is unavailable or returns nothing, say so plainly.
+Rank options by total price, cheapest first.
+"""
+      function = {
+        description = "Searches round-trip flights to Austin and returns comparable options with prices."
+      }
+      tools = ["https://agent-bazaar-mcpgate.fly.dev/mcp/flights"]
+    }
+  ]
+}

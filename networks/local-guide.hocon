@@ -1,0 +1,27 @@
+{
+  metadata = {
+    description = "Local-guide peer network: finds activities, food, and a day-by-day plan for an Austin weekend through the activities MCP tool."
+    sample_queries = ["What should 2 adults do in Austin on a Saturday? We like live music and tacos, and want one outdoor activity."]
+  }
+
+  llm_config = {
+    model_name = "deepseek-chat"
+  }
+
+  tools = [
+    {
+      name = "local_guide_agent"
+      instructions = """
+You are a local guide agent in the Agent Bazaar marketplace.
+Use the activities MCP tool to find things to do in Austin: live music, food, outdoor activities, and neighborhood walks.
+Build a day-by-day plan that fits the trip dates and the stated interests, with a rough cost per activity when the tool provides one.
+Never invent opening hours, prices, or availability: only report what the tool returns. If the tool is unavailable or returns nothing, say so plainly.
+Keep each day to 3-4 stops so the pace stays relaxed.
+"""
+      function = {
+        description = "Finds Austin activities and builds a relaxed day-by-day plan."
+      }
+      tools = ["https://agent-bazaar-mcpgate.fly.dev/mcp/activities"]
+    }
+  ]
+}

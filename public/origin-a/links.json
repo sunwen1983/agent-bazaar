@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "networks": {
+    "concierge": {
+      "flights": "https://agent-bazaar-flights.pages.dev/flights",
+      "local-guide": "https://agent-bazaar-stays.pages.dev/local-guide",
+      "stays": "https://agent-bazaar-stays.pages.dev/stays"
+    }
+  }
+}

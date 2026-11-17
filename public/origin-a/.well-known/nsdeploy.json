@@ -1,0 +1,47 @@
+{
+  "protocol": "nsdeploy-link/v1",
+  "exports": [
+    {
+      "network": "concierge",
+      "front_man": "bazaar_concierge",
+      "aliases": [
+        "concierge",
+        "bazaar_concierge"
+      ],
+      "url": "https://agent-bazaar.pages.dev/concierge"
+    }
+  ],
+  "imports": [
+    {
+      "network": "concierge",
+      "reference": "flights",
+      "callers": [
+        "bazaar_concierge"
+      ],
+      "status": "linked",
+      "target": "https://agent-bazaar-flights.pages.dev/flights"
+    },
+    {
+      "network": "concierge",
+      "reference": "local-guide",
+      "callers": [
+        "bazaar_concierge"
+      ],
+      "status": "linked",
+      "target": "https://agent-bazaar-stays.pages.dev/local-guide"
+    },
+    {
+      "network": "concierge",
+      "reference": "stays",
+      "callers": [
+        "bazaar_concierge"
+      ],
+      "status": "linked",
+      "target": "https://agent-bazaar-stays.pages.dev/stays"
+    }
+  ],
+  "site": "https://agent-bazaar.pages.dev",
+  "link_updates": {
+    "mode": "browser-local"
+  }
+}

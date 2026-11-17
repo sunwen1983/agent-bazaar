@@ -1,0 +1,97 @@
+{
+  "brand": "Concierge",
+  "networks": [
+    {
+      "name": "concierge",
+      "front_man": "bazaar_concierge",
+      "hocon": "./concierge.network.json",
+      "description": "Understands a one-sentence trip request, delegates to peer agent networks, and assembles a complete itinerary under budget.",
+      "tags": [
+        "deployed",
+        "nsdeploy"
+      ],
+      "sample_queries": [
+        "Plan me a 3-day weekend in Austin for under $800."
+      ]
+    }
+  ],
+  "llm_router": {
+    "base_url": "https://api.openai.com/v1",
+    "mock": false,
+    "byok_router": "https://api.openai.com/v1"
+  },
+  "allowed_peers": [
+    "https://agent-bazaar-flights.pages.dev",
+    "https://agent-bazaar-stays.pages.dev"
+  ],
+  "peer_policy": {
+    "mode": "open",
+    "deny_origins": [],
+    "note": "Public agent sites are reachable like web pages; credentials and capabilities do not transfer."
+  },
+  "agent_mcp": {
+    "protocol": "nsdeploy-agent-mcp/v1",
+    "network": "concierge",
+    "front_man": "bazaar_concierge",
+    "available": false,
+    "reason": "This is a static bundle; a public MCP facade requires an application host."
+  },
+  "theme": {
+    "primary": "#0ea5e9"
+  },
+  "linking": {
+    "protocol": "nsdeploy-link/v1",
+    "exports": [
+      {
+        "network": "concierge",
+        "front_man": "bazaar_concierge",
+        "aliases": [
+          "concierge",
+          "bazaar_concierge"
+        ],
+        "url": "https://agent-bazaar.pages.dev/concierge"
+      }
+    ],
+    "imports": [
+      {
+        "network": "concierge",
+        "reference": "flights",
+        "callers": [
+          "bazaar_concierge"
+        ],
+        "status": "linked",
+        "target": "https://agent-bazaar-flights.pages.dev/flights"
+      },
+      {
+        "network": "concierge",
+        "reference": "local-guide",
+        "callers": [
+          "bazaar_concierge"
+        ],
+        "status": "linked",
+        "target": "https://agent-bazaar-stays.pages.dev/local-guide"
+      },
+      {
+        "network": "concierge",
+        "reference": "stays",
+        "callers": [
+          "bazaar_concierge"
+        ],
+        "status": "linked",
+        "target": "https://agent-bazaar-stays.pages.dev/stays"
+      }
+    ],
+    "site": "https://agent-bazaar.pages.dev",
+    "link_updates": {
+      "mode": "browser-local"
+    }
+  },
+  "deployment": {
+    "mode": "static",
+    "self_contained_runtime": true,
+    "browser_mock": false,
+    "direct_byok": true,
+    "direct_mcp_requires_cors": true,
+    "public_mcp_facade": false
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "protocol": "nsdeploy-link/v1",
+  "exports": [
+    {
+      "network": "flights",
+      "front_man": "flights_agent",
+      "aliases": [
+        "flights",
+        "flights_agent"
+      ],
+      "url": "https://agent-bazaar-flights.pages.dev/flights"
+    }
+  ],
+  "imports": [],
+  "site": "https://agent-bazaar-flights.pages.dev",
+  "link_updates": {
+    "mode": "browser-local"
+  }
+}

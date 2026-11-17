@@ -1,0 +1,69 @@
+{
+  metadata = {
+    description = "Agent Bazaar concierge: understands a one-sentence Austin trip request, splits it into flight, stay, and local-guide subtasks, delegates each to the peer agent network on its own origin, and assembles one itinerary under budget."
+    sample_queries = ["Plan me a 3-day weekend in Austin for under $800."]
+  }
+
+  llm_config = {
+    model_name = "deepseek-chat"
+  }
+
+  # Marker text that tells nsdeploy these three leaf agents are replaceable
+  # by separately deployed peer networks (see link_demo_*): any agent whose
+  # instructions contain "part of a demo system" and that has no sub-tools
+  # becomes a link slot. When --link maps the slot to a peer URL, the peer
+  # replaces this local fallback at runtime; when unlinked, the fallback
+  # below runs instead. The fallback itself never invents options.
+  demo_mode = "You are part of a demo system: this is a local fallback for a peer network that is deployed separately."
+
+  tools = [
+    {
+      name = "bazaar_concierge"
+      instructions = """
+You are the front agent of Agent Bazaar, a marketplace where agents from different websites meet in the visitor's browser.
+Your job: turn one sentence from the visitor into a complete Austin weekend plan.
+
+Operating steps:
+1) Parse the request: origin city/airport, dates (default: the coming Friday-Sunday), trip length, party size, total budget.
+2) Delegate in parallel to the three peer networks: flights for round-trip options, stays for hotels, local-guide for activities and a day-by-day plan.
+3) Assemble one itinerary: flights + hotel + daily activities, each item labeled with the peer agent that provided it, with a total price. The total must stay under the stated budget; if it does not, say so and offer the cheapest combination.
+4) Never invent prices, availability, schedules, or links. Only report what the peer networks and their tools returned. If a peer is unreachable or returns nothing usable, say which one and present the partial result honestly instead of filling the gap with made-up options.
+5) Keep the final answer short and scannable: a small table per category, then the total.
+"""
+      function = {
+        description = "Understands a one-sentence trip request, delegates to peer agent networks, and assembles a complete itinerary under budget."
+      }
+      tools = ["flights", "stays", "local-guide"]
+    },
+    {
+      name = "flights"
+      instructions = ${demo_mode} """
+Local fallback for the flights peer network. If the linked flights network is unreachable, say so plainly and do not invent flight options or prices.
+"""
+      function = {
+        description = "Local fallback for the separately deployed flights network."
+      }
+      tools = []
+    },
+    {
+      name = "stays"
+      instructions = ${demo_mode} """
+Local fallback for the stays peer network. If the linked stays network is unreachable, say so plainly and do not invent hotel options or prices.
+"""
+      function = {
+        description = "Local fallback for the separately deployed stays network."
+      }
+      tools = []
+    },
+    {
+      name = "local-guide"
+      instructions = ${demo_mode} """
+Local fallback for the local-guide peer network. If the linked local-guide network is unreachable, say so plainly and do not invent activities or schedules.
+"""
+      function = {
+        description = "Local fallback for the separately deployed local-guide network."
+      }
+      tools = []
+    }
+  ]
+}

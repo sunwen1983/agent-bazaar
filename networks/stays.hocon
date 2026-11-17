@@ -1,0 +1,27 @@
+{
+  metadata = {
+    description = "Stays peer network: searches hotels in Austin through the stays MCP tool and returns options filtered by budget."
+    sample_queries = ["Find a hotel in downtown Austin for 2 nights, 2 adults, under $150 per night, with free cancellation."]
+  }
+
+  llm_config = {
+    model_name = "deepseek-chat"
+  }
+
+  tools = [
+    {
+      name = "stays_agent"
+      instructions = """
+You are a hotel search agent in the Agent Bazaar marketplace.
+Use the stays MCP tool to search hotels in Austin for the requested dates, party size, and nightly budget.
+Return 4-6 options with hotel name, neighborhood, nightly price, total price, cancellation terms, and a booking link when the tool provides one.
+Never invent prices, availability, or policies: only report what the tool returns. If the tool is unavailable or returns nothing, say so plainly.
+Rank options by total price, cheapest first.
+"""
+      function = {
+        description = "Searches hotels in Austin and returns options filtered by budget."
+      }
+      tools = ["https://agent-bazaar-mcpgate.fly.dev/mcp/stays"]
+    }
+  ]
+}

@@ -1,0 +1,90 @@
+{
+  "brand": "Stays",
+  "networks": [
+    {
+      "name": "stays",
+      "front_man": "stays_agent",
+      "hocon": "./stays.network.json",
+      "description": "Searches hotels in Austin and returns options filtered by budget.",
+      "tags": [
+        "deployed",
+        "nsdeploy"
+      ],
+      "sample_queries": [
+        "Find a hotel in downtown Austin for 2 nights, 2 adults, under $150 per night, with free cancellation."
+      ]
+    },
+    {
+      "name": "local-guide",
+      "front_man": "local_guide_agent",
+      "hocon": "./local-guide.network.json",
+      "description": "Finds Austin activities and builds a relaxed day-by-day plan.",
+      "tags": [
+        "deployed",
+        "nsdeploy"
+      ],
+      "sample_queries": [
+        "What should 2 adults do in Austin on a Saturday? We like live music and tacos, and want one outdoor activity."
+      ]
+    }
+  ],
+  "llm_router": {
+    "base_url": "https://api.openai.com/v1",
+    "mock": false,
+    "byok_router": "https://api.openai.com/v1"
+  },
+  "allowed_peers": [
+    "https://agent-bazaar-stays.pages.dev"
+  ],
+  "peer_policy": {
+    "mode": "open",
+    "deny_origins": [],
+    "note": "Public agent sites are reachable like web pages; credentials and capabilities do not transfer."
+  },
+  "agent_mcp": {
+    "protocol": "nsdeploy-agent-mcp/v1",
+    "network": "stays",
+    "front_man": "stays_agent",
+    "available": false,
+    "reason": "This is a static bundle; a public MCP facade requires an application host."
+  },
+  "theme": {
+    "primary": "#0ea5e9"
+  },
+  "linking": {
+    "protocol": "nsdeploy-link/v1",
+    "exports": [
+      {
+        "network": "stays",
+        "front_man": "stays_agent",
+        "aliases": [
+          "stays",
+          "stays_agent"
+        ],
+        "url": "https://agent-bazaar-stays.pages.dev/stays"
+      },
+      {
+        "network": "local-guide",
+        "front_man": "local_guide_agent",
+        "aliases": [
+          "local-guide",
+          "local_guide_agent"
+        ],
+        "url": "https://agent-bazaar-stays.pages.dev/local-guide"
+      }
+    ],
+    "imports": [],
+    "site": "https://agent-bazaar-stays.pages.dev",
+    "link_updates": {
+      "mode": "browser-local"
+    }
+  },
+  "deployment": {
+    "mode": "static",
+    "self_contained_runtime": true,
+    "browser_mock": false,
+    "direct_byok": true,
+    "direct_mcp_requires_cors": true,
+    "public_mcp_facade": false
+  }
+}

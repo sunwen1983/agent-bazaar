@@ -1,0 +1,19 @@
+{
+  "protocol": "nsdeploy-link/v1",
+  "exports": [
+    {
+      "network": "stays",
+      "front_man": "stays_agent",
+      "aliases": [
+        "stays",
+        "stays_agent"
+      ],
+      "url": "https://agent-bazaar-stays.pages.dev/stays"
+    }
+  ],
+  "imports": [],
+  "site": "https://agent-bazaar-stays.pages.dev",
+  "link_updates": {
+    "mode": "browser-local"
+  }
+}
